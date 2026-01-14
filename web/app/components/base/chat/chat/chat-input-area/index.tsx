@@ -11,6 +11,7 @@ import {
   useCallback,
   useRef,
   useState,
+  useEffect
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import Textarea from 'react-textarea-autosize'
@@ -28,6 +29,30 @@ import { cn } from '@/utils/classnames'
 import { useCheckInputsForms } from '../check-input-forms-hooks'
 import { useTextAreaHeight } from './hooks'
 import Operation from './operation'
+
+function useIsCoarsePointer() {
+  const [isCoarse, setIsCoarse] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return
+
+    const mql = window.matchMedia('(pointer: coarse)')
+
+    const update = () => setIsCoarse(mql.matches)
+    update()
+
+    // 구형 브라우저 호환
+    if (mql.addEventListener) mql.addEventListener('change', update)
+    else mql.addListener(update)
+
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener('change', update)
+      else mql.removeListener(update)
+    }
+  }, [])
+
+  return isCoarse
+}
 
 type ChatInputAreaProps = {
   botName?: string
@@ -127,11 +152,16 @@ const ChatInputArea = ({
       isComposingRef.current = false
     }, 50)
   }
+  const isCoarsePointer = useIsCoarsePointer()
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       // if isComposing, exit
       if (isComposingRef.current)
         return
+      // 모바일 브라우저이면 엔터키를 줄바꿈으로 동작하도록 함
+      if (isCoarsePointer) {
+        return
+      }
       e.preventDefault()
       setQuery(query.replace(/\n$/, ''))
       historyRef.current.push(query)
