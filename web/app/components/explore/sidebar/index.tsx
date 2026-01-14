@@ -83,6 +83,11 @@ const SideBar: FC<IExploreSideBarProps> = ({
   }, [controlUpdateInstalledApps, fetchInstalledAppList])
 
   const pinnedAppsCount = installedApps.filter(({ is_pinned }) => is_pinned).length
+
+  if (isMobile) {
+    return null
+  }
+
   return (
     <div className="w-fit shrink-0 cursor-pointer border-r border-divider-burn px-4 pt-6 sm:w-[216px]">
       <div className={cn(isDiscoverySelected ? 'text-text-accent' : 'text-text-tertiary')}>

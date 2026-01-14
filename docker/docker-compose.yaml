@@ -803,7 +803,7 @@ services:
 
   # Frontend web application.
   web:
-    image: langgenius/dify-web:1.11.2
+    image: superkkt/dify-web-fork:latest
     restart: always
     environment:
       CONSOLE_API_URL: ${CONSOLE_API_URL:-}
@@ -1098,8 +1098,7 @@ services:
       - api
       - web
     ports:
-      - "${EXPOSE_NGINX_PORT:-80}:${NGINX_PORT:-80}"
-      - "${EXPOSE_NGINX_SSL_PORT:-443}:${NGINX_SSL_PORT:-443}"
+      - "10.255.255.1:${EXPOSE_NGINX_PORT:-80}:${NGINX_PORT:-80}"
 
   # The Weaviate vector store.
   weaviate:
